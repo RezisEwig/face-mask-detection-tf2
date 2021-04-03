@@ -37,14 +37,6 @@ This model is a lightweight face mask detection model. Based on ssd,the backbone
 ├── inference.py
 ├── logs
 │   └── train
-├── mAP
-│   ├── compute_mAP.py
-│   ├── detection-results
-│   ├── detect.py
-│   ├── ground-truth
-│   ├── __init__.py
-│   ├── map-results
-│   └── README.md
 ├── Maskdata
 │   ├── Annotations
 │   ├── ImageSets
@@ -124,18 +116,11 @@ Create a new python virtual environment by [Anaconda](https://www.anaconda.com/)
   ![](https://raw.githubusercontent.com/PureHing/face-mask-detection-tf2/master/assets/out_1_Handshaking_Handshaking_1_71.jpg)
   
 
-### mAP
-
-+ Convert xml to txt file on  `mAP/ground truth`, predicting  the bbox and class on `mAP/detection-results`.
-
-  ```bash
-   python mAP/detect.py --model_path checkpoints/ --dataset_path Maskdata/ --split val 
-  
-   python mAP/compute_mAP.py
-  ```
 # For K210 project: 
 something refer to [k210-camera-project](https://github.com/PureHing/k210-camera-project).
 # Reference
 + mAP code: [https://github.com/Cartucho/mAP](https://github.com/Cartucho/mAP)
 + SSD-Tensorflow: [https://github.com/balancap/SSD-Tensorflow](https://github.com/balancap/SSD-Tensorflow/)
 + ssd-tf2: [https://github.com/ChunML/ssd-tf2](https://github.com/ChunML/ssd-tf2)
+
+
