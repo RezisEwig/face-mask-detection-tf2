@@ -23,13 +23,13 @@ def _BasicConv(x, out_planes, kernel_size, stride=1, padding='same', dilation=1,
 
         x = tf.keras.layers.BatchNormalization(axis=-1, epsilon=1e-5, momentum=0.99)(x)
 
-        x = tf.keras.layers.ReLU()(x) if activation else x
+        x = tf.keras.layers.LeakyReLU()(x) if activation else x
     else:
         x = tf.keras.layers.Conv2D(out_planes, kernel_size=kernel_size, strides=stride, padding=padding,
                                    dilation_rate=dilation, use_bias=True,
                                    kernel_regularizer=l2_reg,
                                    data_format='channels_last')(x)
-        x = tf.keras.layers.ReLU()(x) if activation else x
+        x = tf.keras.layers.LeakyReLU()(x) if activation else x
 
     return x
 
@@ -47,14 +47,14 @@ def _BasicSepConv(x, out_planes, kernel_size, stride=1, padding='same', dilation
                                             dilation_rate=dilation,
                                             use_bias=use_bias, data_format='channels_last')(x)
         x = tf.keras.layers.BatchNormalization(axis=-1, epsilon=1e-5, momentum=0.01)(x)
-        x = tf.keras.layers.ReLU()(x) if activation else x
+        x = tf.keras.layers.LeakyReLU()(x) if activation else x
 
     else:
         x = tf.keras.layers.SeparableConv2D(out_planes, kernel_size=kernel_size, strides=stride, padding=padding,
                                             kernel_regularizer=l2_reg,
                                             dilation_rate=dilation,
                                             use_bias=True, data_format='channels_last')(x)
-        x = tf.keras.layers.ReLU()(x) if activation else x
+        x = tf.keras.layers.LeakyReLU()(x) if activation else x
 
     return x
 
@@ -96,7 +96,7 @@ def BasicRFB(x, out_planes, stride=1, scale=0.1):
     if stride != 1:
         x = tf.keras.layers.MaxPooling2D(stride, padding='same')(x)
     out = tf.keras.layers.Add()([out, x])
-    out = tf.keras.layers.Activation('relu')(out)
+    out = tf.keras.layers.Activation(tf.nn.leaky_relu)(out)
     return out
 
 
@@ -123,7 +123,7 @@ def _conv_block(inputs, filters, kernel=(3, 3), strides=(1, 1), use_bn=True, pad
                                    name='conv_%d' % block_id)(inputs)
     if use_bn:
         x = tf.keras.layers.BatchNormalization(name='conv_bn_%d' % block_id)(x)
-    return tf.keras.layers.ReLU(name='conv_relu_%d' % block_id)(x)
+    return tf.keras.layers.LeakyReLU(name='conv_relu_%d' % block_id)(x)
 
 
 def _depthwise_conv_block(inputs, pointwise_conv_filters,
@@ -148,7 +148,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters,
                                         name='conv_dw_%d' % block_id)(x)
     if use_bn:
         x = tf.keras.layers.BatchNormalization(name='conv_dw_%d_bn' % block_id)(x)
-    x = tf.keras.layers.ReLU(name='conv_dw_%d_relu' % block_id)(x)
+    x = tf.keras.layers.LeakyReLU(name='conv_dw_%d_relu' % block_id)(x)
 
     x = tf.keras.layers.Conv2D(pointwise_conv_filters, (1, 1),
                                padding='same',
@@ -157,7 +157,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters,
                                name='conv_pw_%d' % block_id)(x)
     if use_bn:
         x = tf.keras.layers.BatchNormalization(name='conv_pw_%d_bn' % block_id)(x)
-    return tf.keras.layers.ReLU(name='conv_pw_%d_relu' % block_id)(x)
+    return tf.keras.layers.LeakyReLU(name='conv_pw_%d_relu' % block_id)(x)
 
 
 def _create_head_block(inputs, filters, strides=(1, 1), block_id=None):
@@ -177,7 +177,7 @@ def _branch_block(input, filters):
 
     x = tf.keras.layers.Concatenate(axis=-1)([x, x1])
 
-    return tf.keras.layers.ReLU()(x)
+    return tf.keras.layers.LeakyReLU()(x)
 
 
 def _compute_heads(x, idx, num_class, num_cell):
@@ -214,29 +214,29 @@ def SlimModel(cfg, num_cell, training=False, name='slim_model'):
     x = inputs = tf.keras.layers.Input(shape=[image_sizes[0], image_sizes[1], 3], name='input_image')
 
     x = _conv_block(x, base_channel, strides=(2, 2))  # 120*160*16
-    x = _conv_block(x, base_channel * 2, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 2, strides=(1, 1))
     x = _conv_block(x, base_channel * 2, strides=(2, 2))  # 60*80
-    x = _conv_block(x, base_channel * 2, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 2, strides=(1, 1))
     x = _conv_block(x, base_channel * 4, strides=(2, 2))  # 30*40
-    x = _conv_block(x, base_channel * 4, strides=(1, 1))
-    x = _conv_block(x, base_channel * 4, strides=(1, 1))
-    x = _conv_block(x, base_channel * 4, strides=(1, 1))
-    # x = BasicRFB(x, base_channel * 4, stride=1, scale=1.0)
+    #x = _conv_block(x, base_channel * 4, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 4, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 4, strides=(1, 1))
+    #x = BasicRFB(x, base_channel * 4, stride=1, scale=1.0)
     x1 = _branch_block(x, base_channel)
 
     x = _conv_block(x, base_channel * 8, strides=(2, 2))  # 15*20
-    x = _conv_block(x, base_channel * 8, strides=(1, 1))
-    x = _conv_block(x, base_channel * 8, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 8, strides=(1, 1))
+    #x = _conv_block(x, base_channel * 8, strides=(1, 1))
     x2 = _branch_block(x, base_channel)
 
     x = _depthwise_conv_block(x, base_channel * 16, strides=(2, 2))  # 8*10
-    x = _depthwise_conv_block(x, base_channel * 16, strides=(1, 1))
+    #x = _depthwise_conv_block(x, base_channel * 16, strides=(1, 1))
     x3 = _branch_block(x, base_channel)
 
     x = _depthwise_conv_block(x, base_channel * 16, strides=(2, 2))  # 4*5
     x4 = _branch_block(x, base_channel)
 
-    extra_layers = [x1, x2, x3,x4]
+    extra_layers = [x1, x2, x3, x4]
 
     confs = []
     locs = []
