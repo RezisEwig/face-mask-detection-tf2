@@ -6,6 +6,7 @@ This model is a lightweight face mask detection model. Based on ssd,the backbone
 ## 주요기능
 
 + 실시간 영상의 사람이 마스크 탐지 여부를 체크하고 미착용시 마스크를 착용해달라는 메세지와 함께 음성이 
+출력됩니다
 
 
 ## Key Features
