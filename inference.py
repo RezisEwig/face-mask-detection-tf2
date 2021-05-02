@@ -21,7 +21,6 @@ from network.network import SlimModel  # defined by tf.keras
 
 flags.DEFINE_string('model_path', 'checkpoints/', 'config file path')
 
-
 def parse_predict(predictions, priors, cfg):
     label_classes = cfg['labels_list']
 
@@ -36,7 +35,6 @@ def parse_predict(predictions, priors, cfg):
 
     for c in range(1, len(label_classes)):
         cls_scores = confs[:, c]
-
         score_idx = cls_scores > cfg['score_threshold']
 
         cls_boxes = boxes[score_idx]
@@ -97,7 +95,7 @@ def main(_):
     #capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     prev_time = 0
-    FPS = 10
+    FPS = 16
 
     priors, _ = priors_box(cfg, image_sizes=(480, 640))
     priors = tf.cast(priors, tf.float32)
@@ -112,11 +110,11 @@ def main(_):
         ret, frame = capture.read()
         if frame is None:
             print('No camera found')
-          #print(frame.shape)
+        #print(frame.shape)
 
         current_time = time.time() - prev_time
 
-        if (ret is True) and (current_time > 1./ FPS) :
+        if (ret is True) and (current_time > 1.0/ FPS) :
             prev_time = time.time()
 
             h, w, _ = frame.shape

@@ -1,7 +1,7 @@
 cfg = {
     # general setting
     "batch_size": 32,
-    "input_size": (240, 320),  # (h,w)
+    "input_size": (480, 640),  # (h,w)
 
     # training dataset
     "dataset_path": 'dataset/train_mask.tfrecord',  # 'dataset/trainval_mask.tfrecord'
@@ -41,7 +41,7 @@ cfg = {
     "save_freq": 1, #frequency of save model weights
 
     # inference
-    "score_threshold": 0.5,
+    "score_threshold": 0.8,
     "nms_threshold": 0.4,
     "max_number_keep": 200
 }
